@@ -56,37 +56,40 @@ function dataUpdate(response, message) {
 }
 
 // Работа с избранным
-const favorites = new FavoritesWidget();
+let favorites = new FavoritesWidget;
 
-updateFavorites = (response) => {
-    favorites.clearTable();
-    favorites.fillTable(response.data);
-    money.updateUsersList(response.data);
-};
-
-ApiConnector.getFavorites((response) => {
+ApiConnector.getFavorites( (response) => {
     if (response.success) {
-        updateFavorites(response);
+        favorites.clearTable();
+        favorites.fillTable(response.data);
+        money.updateUsersList(response.data);
     }
-});
+})
 
 favorites.addUserCallback = (data) => {
     ApiConnector.addUserToFavorites(data, (response) => {
         if (response.success) {
-            updateFavorites(response);
-            favorites.setMessage(false,'Пользователь успешно добавлен!');
-        } else {
-            favorites.setMessage(true, response.data);
+            favorites.clearTable();
+            favorites.fillTable(response.data);
+            money.updateUsersList(response.data);
+            favorites.setMessage(response.success, `Добавление пользователя ${data.name}`)
         }
+
+        else
+            favorites.setMessage(response.success, response.error)
     })
-};
+}
 
 favorites.removeUserCallback = (data) => {
     ApiConnector.removeUserFromFavorites(data, (response) => {
         if (response.success) {
-            updateFavorites(response);
-        } else {
-            favorites.setMessage(true, response.data);
+            favorites.clearTable();
+            favorites.fillTable(response.data);
+            money.updateUsersList(response.data);
+            favorites.setMessage(response.success, `Удаление пользователя №${data}`)
         }
+
+        else
+            favorites.setMessage(response.success, response.error)
     })
-};
+}
